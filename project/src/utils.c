@@ -9,8 +9,6 @@ int custom_pow(int base, int power) {
     int minus = 0;
     if (power == 0) {
         return 1;
-    } else if (power == 1) {
-        return base;
     } else if (power < 0) {
         minus++;
         power *= -1;
