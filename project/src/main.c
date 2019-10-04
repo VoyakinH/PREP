@@ -16,7 +16,7 @@ int main(int argc, const char** argv) {
     }
 
     int test_case = atoi(argv[1]);
-    const char* data;
+    const char* data = '.';
     data = argv[2];
 
     switch (test_case) {
@@ -36,8 +36,9 @@ int main(int argc, const char** argv) {
             break;
         }
         case TST_MOD_IMPL: {
-            if (argc != 3)
+            if (argc != 3) {
                 return ERR_ARGS_COUNT;
+            }
             int num = atoi(data);
             int res = simple_number_check(num);
             printf("%i\n", res);

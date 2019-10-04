@@ -6,19 +6,22 @@ size_t custom_strlen(const char* str) {
 }
 
 int custom_pow(int base, int power) {
-    int minus = 0;
     if (power == 0) {
         return 1;
-    } else if (power < 0) {
-        minus++;
-        power *= -1;
     }
+    
     float res = base;
+    float base_f = base;
+    
+    if (power < 0) {
+        res = 1 / base;
+        power *= -1;
+        base_f = 1 / base_f;
+    }
+    
     while (power > 1) {
-        res *= base;
+        res *= base_f;
         power--;
     }
-    if (minus == 1)
-        res = 1 / res;
     return (int) res;
 }
