@@ -16,8 +16,7 @@ int main(int argc, const char** argv) {
     }
 
     int test_case = atoi(argv[1]);
-    const char* data = '.';
-    data = argv[2];
+    const char* data = argv[2];
 
     switch (test_case) {
         case TST_FOO_FIX: {
