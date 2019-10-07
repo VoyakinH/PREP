@@ -7,8 +7,11 @@ SRCS = \
 
 .PHONY: all clean
 
-all: $(SRCS)
+all: $(SRCS) test
 	$(CC) -Wall -Wextra -Werror -I $(HDRS_DIR) -o $(TARGET) $(CFLAGS) $(SRCS)
+
+test:
+	$(CC) -Wall -Wextra -Werror -I $(HDRS_DIR) -o test.out project/src/unit_test.c
 
 clean:
 	rm -rf $(TARGET)
