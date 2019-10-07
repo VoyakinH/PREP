@@ -64,7 +64,8 @@ void write_black_record(FILE *ofPTR_1, FILE *ofPTR_2, FILE *black_record, data c
                   &client_data.credit_limit,
                   &client_data.cash_payments) != -1) {
         while (fscanf(ofPTR_2, "%d %lf", &transfer.number, &transfer.cash_payments) != -1) {
-            if (client_data.number == transfer.number && transfer.cash_payments != 0) { client_data.credit_limit += transfer.cash_payments;
+            if (client_data.number == transfer.number && transfer.cash_payments != 0) {
+                client_data.credit_limit += transfer.cash_payments;
             }
         }
         fprintf(black_record, "%-12d%-11s%-11s%-16s%20s%12.2f%12.2f%12.2f\n",
