@@ -1,9 +1,25 @@
-#define UTILS_H
-#ifndef UTILS_H
+#ifndef PROJECT_INCLUDE_UTILS_H_
+#define PROJECT_INCLUDE_UTILS_H_
 
-#define filename "transaction.dat";
+#define TRANSACTION_FILE "transaction.dat"
+#define RECORD_FILE "record.dat"
+#define BLACK_RECORD_FILE "blackrecord.dat"
+#define STRUCT_DEFAULT { 0, "", "", "", "", 0, 0, 0}
 
-// This comment is very useful
-printf("This message is very useful too")
+struct master_record {
+    int number;
+    char name[20];
+    char surname[20];
+    char address[30];
+    char tel_number[15];
+    double indebtedness;
+    double credit_limit;
+    double cash_payments;
+};
+typedef struct master_record data;
 
-#endif //UTILS_H
+void write_master(FILE *ofPTR_1, data client);
+void write_transaction(FILE *ofPTR_1, data transfer);
+void write_black_record(FILE *ofPTR_1, FILE *ofPTR_2, FILE *black_record, data client_data, data transfer);
+
+#endif  // PROJECT_INCLUDE_UTILS_H_
