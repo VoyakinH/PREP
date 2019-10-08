@@ -18,8 +18,10 @@ struct master_record {
 };
 typedef struct master_record data;
 
-void write_master(FILE *ofPTR_1, data client);
-void write_transaction(FILE *ofPTR_1, data transfer);
-void write_black_record(FILE *ofPTR_1, FILE *ofPTR_2, FILE *black_record, data client_data, data transfer);
+void write_master(data *client);
+void write_transaction(data *transfer);
+void write_black_record(data *client_data, data *transfer);
+void return_err(char *str);
+int check_and_write(FILE *client_info, FILE *client_transaction, FILE *new_info);
 
 #endif  // PROJECT_INCLUDE_UTILS_H_
