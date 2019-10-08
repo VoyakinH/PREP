@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include "utils.h"
 
-void write_master() {
-    FILE *client_info = fopen(RECORD_FILE, "r+");
+int write_master(char *client_info_file_name) {
+    FILE *client_info = fopen(client_info_file_name, "r+");
     data client = STRUCT_DEFAULT;
     if (client_info == NULL) {
-        return_err(RECORD_FILE);
+        return FILE_OPEN_ERR;
     } else {
         printf("1 Number account:\n"
                "2 Client name:\n"
@@ -44,13 +44,14 @@ void write_master() {
         }
         fclose(client_info);
     }
+    return OK;
 }
 
-void write_transaction() {
-    FILE *client_transaction = fopen(TRANSACTION_FILE, "r+");
+int write_transaction(char *client_transaction_file_name) {
+    FILE *client_transaction = fopen(client_transaction_file_name, "r+");
     data transfer = STRUCT_DEFAULT;
     if (client_transaction == NULL) {
-        return_err(TRANSACTION_FILE);
+        return FILE_OPEN_ERR;
     } else {
         printf("1 Number account: \n"
                "2 Client cash payments: \n");
@@ -61,14 +62,17 @@ void write_transaction() {
         }
         fclose(client_transaction);
     }
+    return OK;
 }
 
-void write_black_record() {
-    FILE *client_info = fopen(RECORD_FILE, "r");
-    FILE *client_transaction = fopen(TRANSACTION_FILE, "r");
-    FILE *new_info = fopen(BLACK_RECORD_FILE, "w");
+int write_black_record(char *client_info_file_name, char *client_transaction_file_name,
+                       char *new_info_file_name) {
+    FILE *client_info = fopen(client_info_file_name, "r");
+    FILE *client_transaction = fopen(client_transaction_file_name, "r");
+    FILE *new_info = fopen(new_info_file_name, "w");
     data client_data = STRUCT_DEFAULT, transfer = STRUCT_DEFAULT;
-    if (check_and_write(client_info, client_transaction, new_info) == 0) {
+    int rc = check_and_write(client_info, client_transaction, new_info);
+    if (rc == 0) {
         while (fscanf(client_info, "%d%20s%20s%30s%15s%lf%lf%lf",
                       &client_data.number,
                       client_data.name,
@@ -97,8 +101,10 @@ void write_black_record() {
         fclose(client_info);
         fclose(client_transaction);
         fclose(new_info);
+    } else {
+        return rc;
     }
-    return;
+    return OK;
 }
 
 int return_err(char *str) {
@@ -108,14 +114,20 @@ int return_err(char *str) {
 
 int check_and_write(FILE *client_info, FILE *client_transaction, FILE *new_info) {
     if (client_info == NULL || client_transaction == NULL || new_info == NULL) {
-        return_err("all files");
-        if (client_info)
+        int what_file = 0;
+        if (client_info) {
+            what_file = 1;
             fclose(client_info);
-        if (client_transaction)
+        }
+        if (client_transaction) {
+            what_file = 2;
             fclose(client_transaction);
-        if (new_info)
+        }
+        if (new_info) {
+            what_file = 3;
             fclose(new_info);
-        return 1;
+        }
+        return what_file;
     } else {
         return 0;
     }
