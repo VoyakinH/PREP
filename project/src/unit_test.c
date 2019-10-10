@@ -31,11 +31,16 @@ void read_from_file(FILE *test_file, data *got_data) {
 int test_write_to_file() {
     const char *filename = "test_file.dat";
     data expected_data = { 1, "Alexei", "Voyakin", "Russia", "89161190130", 10, 100, 5 };
-    data got_data;
+    data got_data = STRUCT_DEFAULT;
+
     FILE *test_file = fopen(filename, "w+");
+
     write_to_file(test_file, expected_data);
+
     rewind(test_file);
+
     read_from_file(test_file, &got_data);
+
     fclose(test_file);
     if (expected_data.number == got_data.number &&
         strcmp(expected_data.name, got_data.name) == 0 &&
@@ -44,8 +49,9 @@ int test_write_to_file() {
         strcmp(expected_data.tel_number, got_data.tel_number) == 0 &&
         expected_data.indebtedness == got_data.indebtedness &&
         expected_data.credit_limit == got_data.credit_limit &&
-        expected_data.cash_payments == got_data.cash_payments)
+        expected_data.cash_payments == got_data.cash_payments) {
         return 0;
+    }
     return 1;
 }
 
@@ -53,7 +59,6 @@ int main() {
     if (test_write_to_file() == 0) {
         printf("Чтение, запись, перезапись выполняются верно");
         return 0;
-    } else {
-        return 1;
     }
+    return 1;
 }

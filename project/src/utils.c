@@ -76,7 +76,7 @@ int write_black_record(char *client_info_file_name, char *client_transaction_fil
     data client_data = STRUCT_DEFAULT;
     data transfer = STRUCT_DEFAULT;
 
-    int rc = check_and_write(client_info, client_transaction, new_info);
+    int rc = check_opening_files(client_info, client_transaction, new_info);
     if (rc == 0) {
         while (fscanf(client_info, "%d%20s%20s%30s%15s%lf%lf%lf",
                       &client_data.number,
@@ -117,7 +117,7 @@ int return_err(char *str) {
     return 1;
 }
 
-int check_and_write(FILE *client_info, FILE *client_transaction, FILE *new_info) {
+int check_opening_files(FILE *client_info, FILE *client_transaction, FILE *new_info) {
     if (client_info == NULL || client_transaction == NULL || new_info == NULL) {
         int what_file = 0;
 

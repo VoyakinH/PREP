@@ -25,6 +25,6 @@ int write_transaction(char *client_transaction_file_name);
 int write_black_record(char *client_info_file_name, char *client_transaction_file_name,
                        char *new_info_file_name);
 int return_err(char *str);
-int check_and_write(FILE *client_info, FILE *client_transaction, FILE *new_info);
+int check_opening_files(FILE *client_info, FILE *client_transaction, FILE *new_info);
 
 #endif  // PROJECT_INCLUDE_UTILS_H_
