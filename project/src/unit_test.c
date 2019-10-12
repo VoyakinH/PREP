@@ -28,20 +28,7 @@ void read_from_file(FILE *test_file, data *got_data) {
     return;
 }
 
-int test_write_to_file() {
-    const char *filename = "test_file.dat";
-    data expected_data = { 1, "Alexei", "Voyakin", "Russia", "89161190130", 10, 100, 5 };
-    data got_data = STRUCT_DEFAULT;
-
-    FILE *test_file = fopen(filename, "w+");
-
-    write_to_file(test_file, expected_data);
-
-    rewind(test_file);
-
-    read_from_file(test_file, &got_data);
-
-    fclose(test_file);
+int compare_structures(data expected_data, data got_data) {
     if (expected_data.number == got_data.number &&
         strcmp(expected_data.name, got_data.name) == 0 &&
         strcmp(expected_data.surname, got_data.surname) == 0 &&
@@ -55,10 +42,35 @@ int test_write_to_file() {
     return 1;
 }
 
+int test_write_to_file() {
+    const char *filename = "test_file.dat";
+    data expected_data = { 1, "Alexei", "Voyakin", "Russia", "89161190130", 10, 100, 5 };
+    data got_data = STRUCT_DEFAULT;
+
+    FILE *test_file = fopen(filename, "w+");
+    
+    if (test_file == NULL) {
+        return 1;
+    }
+
+    write_to_file(test_file, expected_data);
+
+    rewind(test_file);
+
+    read_from_file(test_file, &got_data);
+
+    fclose(test_file);
+    if (compare_structures(expected_data, got_data) == 0) {
+        return 0;
+    }
+    return 1;
+}
+
 int main() {
     if (test_write_to_file() == 0) {
         printf("Чтение, запись, перезапись выполняются верно");
         return 0;
     }
+    printf("Чтение, запись, перезапись выполняются неверно");
     return 1;
 }

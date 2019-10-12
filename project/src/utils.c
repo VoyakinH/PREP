@@ -106,10 +106,9 @@ int write_black_record(char *client_info_file_name, char *client_transaction_fil
         fclose(client_info);
         fclose(client_transaction);
         fclose(new_info);
-    } else {
-        return rc;
+        return OK;
     }
-    return OK;
+    return rc;
 }
 
 int return_err(char *str) {
