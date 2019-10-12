@@ -48,7 +48,7 @@ int test_write_to_file() {
     data got_data = STRUCT_DEFAULT;
 
     FILE *test_file = fopen(filename, "w+");
-    
+
     if (test_file == NULL) {
         return 1;
     }
