@@ -319,7 +319,6 @@ void del_row_and_col(const Matrix* matrix, Matrix* buff, size_t x, size_t y) {
 
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
-
             if (i != x && j != y) {
                 buff->a_p[rows_b][cols_b] = matrix->a_p[i][j];
                 cols_b++;
