@@ -243,44 +243,75 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
     return new_matrix;
 }
 
-int det(const Matrix* matrix, double* val) {
+int replace_rows(Matrix* mat, int x, size_t rows) {
     size_t i;
     size_t j;
 
+    double max = fabs(mat->a_p[x][x]);
+    size_t ind = x;
+    for (i = x + 1; i < rows; i++) {
+        if (fabs(mat->a_p[i][x]) > max) {
+            max = fabs(mat->a_p[i][x]);
+            ind = i;
+        }
+    }
+    if (max == 0) {
+        return 1;
+    }
+    if (max == fabs(mat->a_p[x][x])) {
+        return 2;
+    }
+    for (j = 0; j < rows; j++) {
+        double buff = mat->a_p[x][j];
+        mat->a_p[x][j] = mat->a_p[ind][j];
+        mat->a_p[ind][j] = buff;
+    }
+    return 0;
+}
+
+int det(const Matrix* matrix, double* val) {
+    size_t i;
+    size_t j;
+    size_t k;
     size_t rows = 0;
     size_t cols = 0;
-    size_t indev = 0;
 
-    *val = 0;
+    double buff;
+    int minus = 1;
+    *val = 1;
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
-    if (rc != 0 || cols != rows) {
+    if (rc != 0 || cols != rows || cols == 0) {
         return 1;
     }
-
-    if (cols < 3) {
-        indev = 1;
-    } else {
-        indev = 0;
-    }
-
-    for (i = 0; i < cols - indev; i++) {
-        double mult = 1;
-        for (j = 0; j < rows; j++) {
-            mult *= matrix->a_p[j][(j + i) % cols];
+    Matrix *mat = create_matrix(rows, cols);
+    for (i = 0; i < rows; i++) {
+        for (j = 0 ; j< cols; j++) {
+            mat->a_p[i][j] = matrix->a_p[i][j];
         }
-        *val += mult;
-        mult = 1;
-        for (j = rows - 1; (int) j >= 0; j--) {
-            mult *= matrix->a_p[j][(rows - j + i - 1) % cols];
-            if (j == 0) {
-                break;
+    }
+    for (i = 0; i < rows - 1; i++) {
+        rc = replace_rows(mat, i, rows);
+        if (rc == 1) {
+            free_matrix(mat);
+            *val = 0;
+            return 1;
+        } else if (rc == 0) {
+            minus *= -1;
+        }
+        for (j = i + 1; j < rows; j++) {
+            buff = mat->a_p[j][i] / mat->a_p[i][i];
+            for (k = i; k < cols; k++) {
+                mat->a_p[j][k] -= buff * mat->a_p[i][k];
             }
         }
-        *val -= mult;
     }
-
+    for (i = 0; i < rows; i++) {
+        *val *= mat->a_p[i][i];
+    }
+    *val *= minus;
+    free_matrix(mat);
     return 0;
 }
 
@@ -335,9 +366,12 @@ Matrix* adj(const Matrix* matrix) {
             new_matrix->a_p[i][j] = pow(-1, i + j) * val;
         }
     }
-    free_matrix(buff);
+    Matrix *mat = transp(new_matrix);
 
-    return new_matrix;
+    free_matrix(buff);
+    free_matrix(new_matrix);
+
+    return mat;
 }
 
 Matrix* inv(const Matrix* matrix) {
@@ -355,8 +389,6 @@ Matrix* inv(const Matrix* matrix) {
     }
 
     Matrix *buff = adj(matrix);
-
-    buff = transp(buff);
     Matrix *new_matrix = mul_scalar(buff, val);
 
     free_matrix(buff);
