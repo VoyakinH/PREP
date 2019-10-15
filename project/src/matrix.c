@@ -102,7 +102,7 @@ int get_cols(const Matrix* matrix, size_t* cols) {
 }
 
 int get_elem(const Matrix* matrix, size_t row, size_t col, double* val) {
-    if (row == 0 || col == 0 || !matrix) {
+    if (!matrix) {
         return 1;
     }
 
@@ -111,7 +111,7 @@ int get_elem(const Matrix* matrix, size_t row, size_t col, double* val) {
 }
 
 int set_elem(Matrix* matrix, size_t row, size_t col, double val) {
-    if (row == 0 || col == 0 || !matrix) {
+    if (!matrix) {
         return 1;
     }
 
@@ -211,10 +211,10 @@ Matrix* sub(const Matrix* l, const Matrix* r) {
     return new_matrix;
 }
 
-float find_elem(const Matrix* l, const Matrix* r, size_t x, size_t y) {
+double find_elem(const Matrix* l, const Matrix* r, size_t x, size_t y) {
     size_t cols_l = 0;
     get_cols(l, &cols_l);
-    float s = 0;
+    double s = 0;
 
     for (size_t i = 0; i < cols_l; i++) {
         s += l->a_p[x][i] * r->a_p[i][y];
@@ -239,24 +239,10 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
     if (cols_l != rows_r || rc != 0)
         return NULL;
 
-    size_t rows_res = 0;
-    size_t cols_res = 0;
+    Matrix *new_matrix = create_matrix(rows_l, cols_r);
 
-    if (rows_l < rows_r) {
-        rows_res = rows_l;
-    } else {
-        rows_res = rows_r;
-    }
-    if (cols_l < cols_r) {
-        cols_res = cols_l;
-    } else {
-        cols_res = cols_r;
-    }
-
-    Matrix *new_matrix = create_matrix(rows_res, cols_res);
-
-    for (i = 0; i < rows_res; i++) {
-        for (j = 0; j < cols_res; j++) {
+    for (i = 0; i < rows_l; i++) {
+        for (j = 0; j < cols_r; j++) {
             new_matrix->a_p[i][j] = find_elem(l, r, i, j);
         }
     }
