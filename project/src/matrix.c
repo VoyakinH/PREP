@@ -8,7 +8,7 @@ Matrix* create_matrix(size_t rows, size_t cols) {
     size_t i;
 
     double *a_new = calloc(rows * cols, sizeof(double));
-    double **a_p_new = calloc(rows, sizeof(double*));
+    double **a_p_new = malloc(rows * sizeof(double*));
 
     if (a_new && a_p_new) {
         matrix->a = a_new;
@@ -70,15 +70,9 @@ Matrix* create_matrix_from_file(const char* path_file) {
 }
 
 int free_matrix(Matrix* matrix) {
-    if (matrix->a == NULL) {
-        free(matrix->a);
-    }
-    if (matrix->a_p == NULL) {
-        free(matrix->a_p);
-    }
-    if (matrix) {
-        free(matrix);
-    }
+    free(matrix->a);
+    free(matrix->a_p);
+    free(matrix);
 
     return 0;
 }
@@ -136,7 +130,6 @@ Matrix* mul_scalar(const Matrix* matrix, double val) {
             new_matrix->a_p[i][j] = matrix->a_p[i][j] * val;
         }
     }
-
     return new_matrix;
 }
 
