@@ -23,8 +23,12 @@ Matrix *create_matrix(size_t rows, size_t cols) {
 Matrix *create_matrix_from_file(const char *path_file) {
     Matrix *matrix = malloc(sizeof(Matrix));
 
+    if (!matrix) {
+        return NULL;
+    }
+
     FILE *f = fopen(path_file, "r");
-    if (!f || !matrix) {
+    if (!f) {
         free_matrix(matrix);
         return NULL;
     }
