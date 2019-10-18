@@ -3,14 +3,13 @@
 #include <stdio.h>
 #include "matrix.h"
 
-Matrix* create_matrix(size_t rows, size_t cols) {
+Matrix *create_matrix(size_t rows, size_t cols) {
     Matrix *matrix = malloc(sizeof(Matrix));
 
     double *a_new = calloc(rows * cols, sizeof(double));
 
     if (a_new) {
         matrix->a = a_new;
-        a_new = NULL;
     } else {
         free_matrix(matrix);
         return NULL;
@@ -21,9 +20,8 @@ Matrix* create_matrix(size_t rows, size_t cols) {
     return matrix;
 }
 
-Matrix* create_matrix_from_file(const char* path_file) {
+Matrix *create_matrix_from_file(const char* path_file) {
     Matrix *matrix = malloc(sizeof(Matrix));
-    size_t i, j;
 
     FILE *f = fopen(path_file, "r");
     if (!f) {
@@ -37,13 +35,15 @@ Matrix* create_matrix_from_file(const char* path_file) {
     double *a_new = calloc(matrix->rows * matrix->cols, sizeof(double));
     if (a_new) {
         matrix->a = a_new;
-        a_new = NULL;
     } else {
         fclose(f);
         free_matrix(matrix);
         return NULL;
     }
     double val = 0;
+    size_t i;
+    size_t j;
+
     for (i = 0; i < matrix->rows; i++) {
         for (j = 0; j < matrix->cols; j++) {
             fscanf(f, "%lf", &val);
@@ -55,14 +55,14 @@ Matrix* create_matrix_from_file(const char* path_file) {
     return matrix;
 }
 
-int free_matrix(Matrix* matrix) {
+int free_matrix(Matrix *matrix) {
     free(matrix->a);
     free(matrix);
 
     return 0;
 }
 
-int get_rows(const Matrix* matrix, size_t* rows) {
+int get_rows(const Matrix *matrix, size_t *rows) {
     if (!matrix) {
         return 1;
     }
@@ -71,7 +71,7 @@ int get_rows(const Matrix* matrix, size_t* rows) {
     return 0;
 }
 
-int get_cols(const Matrix* matrix, size_t* cols) {
+int get_cols(const Matrix *matrix, size_t *cols) {
     if (!matrix) {
         return 1;
     }
@@ -80,8 +80,8 @@ int get_cols(const Matrix* matrix, size_t* cols) {
     return 0;
 }
 
-int get_elem(const Matrix* matrix, size_t row, size_t col, double* val) {
-    if (!matrix) {
+int get_elem(const Matrix *matrix, size_t row, size_t col, double *val) {
+    if (!matrix || row >= matrix->rows || col >= matrix->cols) {
         return 1;
     }
 
@@ -89,8 +89,8 @@ int get_elem(const Matrix* matrix, size_t row, size_t col, double* val) {
     return 0;
 }
 
-int set_elem(Matrix* matrix, size_t row, size_t col, double val) {
-    if (!matrix) {
+int set_elem(Matrix *matrix, size_t row, size_t col, double val) {
+    if (!matrix || row >= matrix->rows || col >= matrix->cols) {
         return 1;
     }
 
@@ -98,7 +98,7 @@ int set_elem(Matrix* matrix, size_t row, size_t col, double val) {
     return 0;
 }
 
-Matrix* mul_scalar(const Matrix* matrix, double val) {
+Matrix *mul_scalar(const Matrix *matrix, double val) {
     size_t rows = 0;
     size_t cols = 0;
 
@@ -121,7 +121,7 @@ Matrix* mul_scalar(const Matrix* matrix, double val) {
     return new_matrix;
 }
 
-Matrix* transp(const Matrix* matrix) {
+Matrix *transp(const Matrix *matrix) {
     size_t rows = 0;
     size_t cols = 0;
 
@@ -145,7 +145,7 @@ Matrix* transp(const Matrix* matrix) {
     return new_matrix;
 }
 
-Matrix* sum(const Matrix* l, const Matrix* r) {
+Matrix *sum(const Matrix *l, const Matrix *r) {
     size_t rows_l = 0;
     size_t cols_l = 0;
     size_t rows_r = 0;
@@ -175,7 +175,7 @@ Matrix* sum(const Matrix* l, const Matrix* r) {
     return new_matrix;
 }
 
-Matrix* sub(const Matrix* l, const Matrix* r) {
+Matrix *sub(const Matrix *l, const Matrix *r) {
     size_t rows_l = 0;
     size_t cols_l = 0;
     size_t rows_r = 0;
@@ -205,7 +205,7 @@ Matrix* sub(const Matrix* l, const Matrix* r) {
     return new_matrix;
 }
 
-double find_elem(const Matrix* l, const Matrix* r, size_t x, size_t y) {
+static double find_elem(const Matrix *l, const Matrix *r, size_t x, size_t y) {
     size_t cols_l = 0;
     get_cols(l, &cols_l);
     double s = 0;
@@ -222,10 +222,7 @@ double find_elem(const Matrix* l, const Matrix* r, size_t x, size_t y) {
     return s;
 }
 
-Matrix* mul(const Matrix* l, const Matrix* r) {
-    size_t i;
-    size_t j;
-
+Matrix *mul(const Matrix *l, const Matrix *r) {
     size_t rows_l = 0;
     size_t cols_l = 0;
     size_t rows_r = 0;
@@ -235,12 +232,15 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
     rc += get_cols(l, &cols_l);
     rc += get_rows(r, &rows_r);
     rc += get_cols(r, &cols_r);
-    if (cols_l != rows_r || rc != 0)
+    if (cols_l != rows_r || rc != 0) {
         return NULL;
+    }
 
     Matrix *new_matrix = create_matrix(rows_l, cols_r);
 
     double new_elem;
+    size_t i;
+    size_t j;
 
     for (i = 0; i < rows_l; i++) {
         for (j = 0; j < cols_r; j++) {
@@ -252,15 +252,16 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
     return new_matrix;
 }
 
-int replace_rows(Matrix* mat, int x, size_t rows) {
-    size_t i;
-    size_t j;
-
+static int replace_rows(Matrix *mat, int x, size_t rows) {
     double elem = 0;
 
     get_elem(mat, x, x, &elem);
     double max = fabs(elem);
     size_t ind = x;
+
+    size_t i;
+    size_t j;
+
     for (i = x + 1; i < rows; i++) {
         get_elem(mat, i, x, &elem);
         if (fabs(elem) > max) {
@@ -288,10 +289,7 @@ int replace_rows(Matrix* mat, int x, size_t rows) {
     return 0;
 }
 
-int det(const Matrix* matrix, double* val) {
-    size_t i;
-    size_t j;
-    size_t k;
+int det(const Matrix *matrix, double *val) {
     size_t rows = 0;
     size_t cols = 0;
 
@@ -308,6 +306,9 @@ int det(const Matrix* matrix, double* val) {
 
     double elem_1 = 0;
     double elem_2 = 0;
+    size_t i;
+    size_t j;
+    size_t k;
 
     for (i = 0; i < rows; i++) {
         for (j = 0 ; j< cols; j++) {
@@ -345,7 +346,7 @@ int det(const Matrix* matrix, double* val) {
     return 0;
 }
 
-void del_row_and_col(const Matrix* matrix, Matrix* buff, size_t x, size_t y) {
+static void del_row_and_col(const Matrix *matrix, Matrix *buff, size_t x, size_t y) {
     size_t rows = 0;
     size_t cols = 0;
 
@@ -376,12 +377,9 @@ void del_row_and_col(const Matrix* matrix, Matrix* buff, size_t x, size_t y) {
     return;
 }
 
-Matrix* adj(const Matrix* matrix) {
-    size_t i;
-    size_t j;
+Matrix *adj(const Matrix *matrix) {
     size_t rows = 0;
     size_t cols = 0;
-    double val = 0;
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
@@ -391,6 +389,10 @@ Matrix* adj(const Matrix* matrix) {
 
     Matrix *new_matrix = create_matrix(rows, cols);
     Matrix *buff = create_matrix(rows - 1, cols - 1);
+
+    size_t i;
+    size_t j;
+    double val = 0;
 
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
@@ -407,7 +409,7 @@ Matrix* adj(const Matrix* matrix) {
     return mat;
 }
 
-Matrix* inv(const Matrix* matrix) {
+Matrix *inv(const Matrix* matrix) {
     size_t rows = 0;
     size_t cols = 0;
     double val = 0;
