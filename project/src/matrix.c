@@ -8,8 +8,9 @@ Matrix *create_matrix(size_t rows, size_t cols) {
 
     double *a_new = calloc(rows * cols, sizeof(double));
 
-    if (!a_new) {
-        free_matrix(matrix);
+    if (!a_new || !matrix) {
+        free(matrix);
+        free(a_new);
         return NULL;
     }
     matrix->a = a_new;
@@ -23,8 +24,7 @@ Matrix *create_matrix_from_file(const char *path_file) {
     Matrix *matrix = malloc(sizeof(Matrix));
 
     FILE *f = fopen(path_file, "r");
-    if (!f) {
-        printf("Can not open file: %s\n", path_file);
+    if (!f || !matrix) {
         free_matrix(matrix);
         return NULL;
     }
@@ -52,8 +52,10 @@ Matrix *create_matrix_from_file(const char *path_file) {
 }
 
 int free_matrix(Matrix *matrix) {
-    free(matrix->a);
-    free(matrix);
+    if (matrix) {
+        free(matrix->a);
+        free(matrix);
+    }
 
     return 0;
 }
@@ -100,13 +102,16 @@ Matrix *mul_scalar(const Matrix *matrix, double val) {
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
-    if (rc != 0 || rows == 0 || cols == 0) {
+    if (rc != 0 || rows == 0 || cols == 0 || !matrix) {
         return NULL;
     }
 
     double elem = 0;
 
     Matrix *new_matrix = create_matrix(rows, cols);
+    if (!new_matrix) {
+        return NULL;
+    }
 
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
@@ -123,13 +128,16 @@ Matrix *transp(const Matrix *matrix) {
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
-    if (rc != 0 || rows == 0 || cols == 0) {
+    if (rc != 0 || rows == 0 || cols == 0 || !matrix) {
         return NULL;
     }
 
     double elem = 0;
 
     Matrix *new_matrix = create_matrix(cols, rows);
+    if (!new_matrix) {
+        return NULL;
+    }
 
     for (size_t i = 0; i < rows; i++) {
         for (size_t j = 0; j < cols; j++) {
@@ -156,6 +164,9 @@ Matrix *sum(const Matrix *l, const Matrix *r) {
     }
 
     Matrix *new_matrix = create_matrix(rows_l, cols_l);
+    if (!new_matrix) {
+        return NULL;
+    }
 
     double elem_l = 0;
     double elem_r = 0;
@@ -186,6 +197,9 @@ Matrix *sub(const Matrix *l, const Matrix *r) {
     }
 
     Matrix *new_matrix = create_matrix(rows_l, cols_l);
+    if (!new_matrix) {
+        return NULL;
+    }
 
     double elem_l = 0;
     double elem_r = 0;
@@ -228,11 +242,14 @@ Matrix *mul(const Matrix *l, const Matrix *r) {
     rc += get_cols(l, &cols_l);
     rc += get_rows(r, &rows_r);
     rc += get_cols(r, &cols_r);
-    if (cols_l != rows_r || rc != 0) {
+    if (cols_l != rows_r || rc != 0 || !l || !r) {
         return NULL;
     }
 
     Matrix *new_matrix = create_matrix(rows_l, cols_r);
+    if (!new_matrix) {
+        return NULL;
+    }
 
     double new_elem;
 
@@ -290,10 +307,13 @@ int det(const Matrix *matrix, double *val) {
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
-    if (rc != 0 || cols != rows || cols == 0) {
+    if (rc != 0 || cols != rows || cols == 0 || !matrix) {
         return 1;
     }
     Matrix *mat = create_matrix(rows, cols);
+    if (!mat) {
+        return 1;
+    }
 
     double elem_1 = 0;
     double elem_2 = 0;
@@ -369,12 +389,17 @@ Matrix *adj(const Matrix *matrix) {
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
-    if (rc != 0 || cols != rows) {
+    if (rc != 0 || cols != rows || !matrix) {
         return NULL;
     }
 
     Matrix *new_matrix = create_matrix(rows, cols);
     Matrix *buff = create_matrix(rows - 1, cols - 1);
+    if (!new_matrix || !buff) {
+        free_matrix(new_matrix);
+        free_matrix(buff);
+        return NULL;
+    }
 
     double val = 0;
 
@@ -399,11 +424,14 @@ Matrix *inv(const Matrix *matrix) {
     double val = 0;
 
     det(matrix, &val);
+    if (val == 0) {
+        return NULL;
+    }
     val = 1 / val;
 
     int rc = get_rows(matrix, &rows);
     rc += get_cols(matrix, &cols);
-    if (rc != 0 || cols != rows || val == 0) {
+    if (rc != 0 || cols != rows || !matrix) {
         return NULL;
     }
 
