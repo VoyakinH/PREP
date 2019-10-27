@@ -163,7 +163,7 @@ int get_title_text(FILE *f, char **parsed, char **got_str) {
         }
         fseek(f, 1, SEEK_CUR);
         for (int i = 0; i < count; i++) {
-            strncat(*parsed, " ", 1);
+            strncat(*parsed, " ", 2);
         }
         if (feof(f)) {
             break;
