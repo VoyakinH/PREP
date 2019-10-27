@@ -1,3 +1,4 @@
+#define _GNU_SOURCE char *strcasestr(const char *haystack, const char *needle)
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
