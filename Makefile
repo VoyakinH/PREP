@@ -2,15 +2,16 @@ TARGET = main.out
 
 # XXX: Don't forget backslash at the end of any line except the last one
 HDRS = \
-	   project/include
+	project/include
 
 SRCS = \
-       project/src/main.c
+       	project/src/main.c\
+	project/src/utils.c
 
 .PHONY: all clean
 
 all: $(SRCS)
-	$(CC) -Wall -Wextra -Werror $(addprefix -I,$(HDRS)) -o $(TARGET) $(CFLAGS) $(SRCS)
+	$(CC) -Wall -Wextra -Werror -g3 -O0 $(addprefix -I,$(HDRS)) -o $(TARGET) $(CFLAGS) $(SRCS)
 
 clean:
 	rm -rf $(TARGET)
